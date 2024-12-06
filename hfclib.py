@@ -1,4 +1,5 @@
 import re
+import warnings
 
 
 # Known issues
@@ -434,6 +435,13 @@ def parseList(hfc_list: list[dict[dict]], write_path="", newline_after_section=T
 
                 hfc += f"{variable}{space}{langconf.VARIABLE_SEPARATOR}{space}{conv_definition}\n"
 
+
+    # Parse hfc to check validity
+    try:
+        parseHfc(hfc)
+    except Exception as e:
+        warnings.warn(f"Generated invalid .hfc string: {e}")
+
     # If write_on is not empty, write the file
     if write_path != "":
         open(f"{write_path}", "w+").write(hfc)
@@ -441,5 +449,73 @@ def parseList(hfc_list: list[dict[dict]], write_path="", newline_after_section=T
     return hfc
 
 
+# Add comments to a hfc file or string
+def addComments(comments: list[list[int, str]], comment_char="->", input_path="", hfc="", output_path=""):
+    """
+    Add comments to a HFC file or string.
+
+    Parameters
+    ----------
+    comments : list[list[int, str]]
+        A list of comments, where each comment is a list of two elements: the line number and the comment string.
+    comment_char : str
+        The character to use for comments.
+    input_path : str
+        The path to the HFC file to read from. If empty, it won't read from file.
+    hfc : str
+        The HFC string to write to. If empty, it won't write to a string.
+    output_path : str
+        The path to write the output to. If empty, it won't write to a file.
+
+    Returns
+    -------
+    str
+        The HFC string with comments.
+    """
+    hfc_str = ""
+    
+    if input_path != "":
+        hfc_str = open(input_path, "r").readlines()
+        # Remove \n on each index
+        for index in range(len(hfc_str)):
+            hfc_str[index] = hfc_str[index].strip("\n")
+    
+    if hfc != "":
+        hfc_str = hfc.split("\n")
+
+    # If both input_path and hfc are empty, raise error
+    if input_path == "" and hfc == "":
+        raise ValueError("No input file or HFC string provided")
+
+    # Add comments to the HFC string
+    line = 0
+
+    for ln in hfc_str:
+        # Look for current line on comments list
+        for comment in comments:
+            if comment[0] == line+1:
+                hfc_str[line] = f"{ln}{comment_char} {comment[1]}"
+                break
+
+        line += 1
+    
+    # Parse to check validity
+    try:
+        parseHfc("\n".join(hfc_str))
+    except Exception as e:
+        warnings.warn(f"Generated invalid .hfc string: {e}")
+
+    hfc_str = "\n".join(hfc_str)
+    if output_path != "":
+        open(output_path, "w+").write(hfc_str)
+
+    return hfc_str
+
+
 if __name__ == "__main__":
-    pass
+    try:
+        import sample
+    except Exception as e:
+        raise e
+    
+    sample.main()
