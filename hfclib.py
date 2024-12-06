@@ -686,6 +686,83 @@ def editSection(section_name: str, new_section_name: str, hfc_list: list[dict[di
     
     return list_edit
 
+
+# Get all variables from a section
+def getVariables(section_name: str, hfc_list: list[dict[dict]]) -> dict:
+    """
+    Get all variables from a specified section in a HFC list.
+
+    Parameters
+    ----------
+    section_name : str
+        The name of the section to get variables from.
+    hfc_list : list[dict[dict]]
+        The HFC list to be modified.
+
+    Returns
+    -------
+    dict
+        A dictionary with all variables from the specified section.
+
+    Raises
+    ------
+    ValueError
+        If the section is not found in the HFC list.
+    """
+    
+    list_get = hfc_list
+
+    # Look for section
+    if not _section_exists(list_get, section_name):
+        raise ValueError(f"Section {section_name} not found in HFC list")
+
+    for section in list_get:
+        if section_name in section.keys():
+            # Get variables
+            return section[section_name]
+    
+    return []
+
+# Get the value of a specific variable (full hfc list)
+def getVariableValue(section_name: str, variable_name: str, hfc_list: list[dict[dict]]):
+    """
+    Get the value of a specific variable in a HFC list.
+
+    Parameters
+    ----------
+    section_name : str
+        The name of the section where the variable is located.
+    variable_name : str
+        The name of the variable to get the value of.
+    hfc_list : list[dict[dict]]
+        The HFC list to be modified.
+
+    Returns
+    -------
+    any
+        The value of the specified variable.
+
+    Raises
+    ------
+    ValueError
+        If the section is not found in the HFC list or if the variable is not found in the section.
+    """
+    
+    list_get = hfc_list
+
+    # Look for section
+    if not _section_exists(list_get, section_name):
+        raise ValueError(f"Section {section_name} not found in HFC list")
+
+    for section in list_get:
+        if section_name in section.keys():
+            # Get variable value
+            if _variable_exists(list_get, section_name, variable_name):
+                return section[section_name][variable_name]
+            else:
+                raise ValueError(f"Variable {variable_name} not found in section {section_name}")
+
+
 # Add a variable to a hfc list
 def addVariable(section_name: str, variable_name: str, variable_value, hfc_list: list[dict[dict]]):
     """
@@ -885,4 +962,8 @@ def generateHFC():
 
 
 if __name__ == "__main__":
+    hfc_list = parseHfc(hfc_path="speed.hfc")
+    print(getVariables("Section 1", hfc_list))
+    print(getVariableValue("Section 1", "Variable_1", hfc_list))
+    
     print("hfclib.py is not intended to be run directly")

@@ -223,6 +223,30 @@ Rename a section from a hfc-valid json-like object
 
 Returns a json-like object.
 
+### getVariables(section_name: str, hfc_list: list[dict[dict]])
+
+Get all the variables of a specified section.
+
+| Arg | Optional? | Content |Type |
+| ------ | ------ | ------ | ------ |
+| section_name | No | Name of the section | str |
+| hfc_list | No | hfc-valid json-like object | list[dict[dict]] |
+
+Returns a dict with all variables.
+
+### getVariableValue(section_name: str, variable_name: str, hfc_list: list[dict[dict]])
+
+Gets the value of a variable at a specified section
+
+| Arg | Optional? | Content |Type |
+| ------ | ------ | ------ | ------ |
+| section_name | No | Name of the section | str |
+| variable_name | No | Name of the variable at section | str |
+| hfc_list | No | hfc-valid json-like object | list[dict[dict]] |
+
+Returns any value.
+
+
 ### addVariable(section_name: str, variable_name: str, variable_value, hfc_list: list[dict[dict]])
 
 Adds a variable to a defined section.
