@@ -236,7 +236,7 @@ Returns a dict with all variables.
 
 ### getVariableValue(section_name: str, variable_name: str, hfc_list: list[dict[dict]])
 
-Gets the value of a variable at a specified section
+Gets the value of a variable at a specified section from a HFC object.
 
 | Arg | Optional? | Content |Type |
 | ------ | ------ | ------ | ------ |
@@ -245,6 +245,17 @@ Gets the value of a variable at a specified section
 | hfc_list | No | hfc-valid json-like object | list[dict[dict]] |
 
 Returns any value.
+
+### getVariableValueFromDict(variable_name: str, dictionary: dict)
+
+Gets the value of a variable from a dictionary
+
+| Arg | Optional? | Content |Type |
+| ------ | ------ | ------ | ------ |
+| variable_name | No | Name of the variable | str |
+| dictionary | No | Any dictionary | dict |
+
+Returns any value
 
 
 ### addVariable(section_name: str, variable_name: str, variable_value, hfc_list: list[dict[dict]])

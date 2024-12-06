@@ -763,6 +763,14 @@ def getVariableValue(section_name: str, variable_name: str, hfc_list: list[dict[
                 raise ValueError(f"Variable {variable_name} not found in section {section_name}")
 
 
+# Get variable value from a dictionary
+def getVariableValueFromDict(variable_name: str, dictionary: dict):
+    try:
+        return dictionary[variable_name]
+    except KeyError:
+        raise ValueError(f"Variable {variable_name} not found in dictionary.")
+
+
 # Add a variable to a hfc list
 def addVariable(section_name: str, variable_name: str, variable_value, hfc_list: list[dict[dict]]):
     """
