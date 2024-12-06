@@ -175,3 +175,6 @@ Always returns a hfc-like string.
 
 **Disclaimer: Invalid args may generate an invalid hfc string.**
 
+
+**Disclaimer 2: You need to specify either an input_path or a hfc. Not specifing any of them will raise an error.**
+
