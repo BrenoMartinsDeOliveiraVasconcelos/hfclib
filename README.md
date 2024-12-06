@@ -189,3 +189,90 @@ Gets all the comments at a hfc file or string.
 
 **Disclaimer: Specify one of these args, otherwise an error will be raised.**
 
+### addSection(section_name: str, hfc_list: list[dict[dict]])
+
+Adds a section to a hfc-valid json-like object.
+
+| Arg | Optional? | Content |Type |
+| ------ | ------ | ------ | ------ |
+| section_name | No | Name of the new section | str |
+| hfc_list| No | hfc-valid json-like object | list[dict[dict]] |
+
+Returns a json-like object
+
+### removeSection(section_name: str, hfc_list: list[dict[dict]]):
+
+Removes a section from a hfc-valid json-like object.
+
+| Arg | Optional? | Content |Type |
+| ------ | ------ | ------ | ------ |
+| section_name | No | Name of the section to be removed | str |
+| hfc_list | No | hfc-valid json-like object | list[dict[dict]] |
+
+Returns a json-like object.
+
+### editSection(section_name: str, new_section_name: str, hfc_list: list[dict[dict]]):
+
+Rename a section from a hfc-valid json-like object
+
+| Arg | Optional? | Content |Type |
+| ------ | ------ | ------ | ------ |
+| section_name | No | Name of the section to be renamed | str |
+| new_section_name | No | New name of the defined section | str |
+| hfc_list | No | hfc-valid json-like object | list[dict[dict]] |
+
+Returns a json-like object.
+
+### addVariable(section_name: str, variable_name: str, variable_value, hfc_list: list[dict[dict]])
+
+Adds a variable to a defined section.
+
+| Arg | Optional? | Content |Type |
+| ------ | ------ | ------ | ------ |
+| section_name | No | Name of the section where the variable will be stored | str |
+| variable_name | No | Name of the variable to be added | str |
+| variable_value | No | Value of the specirfied variable | any |
+| hfc_list | No | hfc-valid json-like object | list[dict[dict]] |
+
+Returns a json-like object.
+
+
+### removeVariable(section_name: str, variable_name: str, hfc_list: list[dict[dict]])
+
+Removes a variable from a defined section.
+
+| Arg | Optional? | Content |Type |
+| ------ | ------ | ------ | ------ |
+| section_name | No | Name of the section where the variable will be removed | str |
+| variable_name | No | Name of the variable to be removed | str |
+| hfc_list | No | hfc-valid json-like object | list[dict[dict]] |
+
+Returns a json-like object.
+
+### renameVariable(section_name: str, old_variable_name: str, new_variable_name: str, hfc_list: list[dict[dict]])
+
+Renames a variable from a defined section.
+
+| Arg | Optional? | Content |Type |
+| ------ | ------ | ------ | ------ |
+| section_name | No | Name of the section where the variable is | str |
+| old_variable_name | No | Name of the variable to be renamed | str |
+| new_variable_name | No | New name for variable | str |
+| hfc_list | No | hfc-valid json-like object | list[dict[dict]] |
+
+Returns a json-like object.
+
+### editVariable(section_name: str, variable_name: str, new_variable_value, hfc_list: list[dict[dict]])
+
+Edits a variable from a defined section.
+
+| Arg | Optional? | Content |Type |
+| ------ | ------ | ------ | ------ |
+| section_name | No | Name of the section where the variable is | str |
+| variable_name | No | Name of the variable to be edited | str |
+| new_variable_value | No | New value for variable | any |
+| hfc_list | No | hfc-valid json-like object | list[dict[dict]] |
+
+Returns a json-like object.
+
+

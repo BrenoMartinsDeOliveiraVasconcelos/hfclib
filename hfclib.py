@@ -267,6 +267,26 @@ def _convert_to_hfc(definition, list_char: list[str, str], bool_false: str, bool
     return definition
 
 
+
+def _section_exists(hfc_list: list[dict[dict]], section_name: str) -> bool:
+    for section in hfc_list:
+        if section_name in section.keys():
+            return True
+
+    return False
+
+
+def _variable_exists(hfc_list: list[dict[dict]], section_name: str, variable_name: str) -> bool:
+    if not _section_exists(hfc_list, section_name):
+        return False
+    
+    for section in hfc_list:
+        for section_name in section.keys():
+            if variable_name in section[section_name].keys():
+                return True
+
+    return False
+
 def parseHfc(hfc_path="", hfc_text="", json_path = "", json_indent=4) -> list[dict[dict]]:
     """
     Parse a HFC text/file to a list of dictionaries.
@@ -558,9 +578,299 @@ def getComments(hfc_path="", hfc_text="") -> list[list[int, str]]:
     return comments
 
 
-if __name__ == "__main__":
-    print(getComments("test.hfc"))
+# Add a section to a hfc list
+def addSection(section_name: str, hfc_list: list[dict[dict]]):
+    """
+    Add a section to a HFC list.
+
+    Parameters
+    ----------
+    section_name : str
+        The name of the new section.
+    hfc_list : list[dict[dict]]
+        The HFC list to be modified.
+
+    Returns
+    -------
+    list[dict[dict]]
+        The modified HFC list.
+    """
     
+    list_add = hfc_list
+    list_add.append({section_name: {}})
+    
+    return list_add
+
+
+# Remove a section from a hfc text or list
+def removeSection(section_name: str, hfc_list: list[dict[dict]]):
+    """
+    Remove a section from a HFC list.
+
+    Parameters
+    ----------
+    section_name : str
+        The name of the section to be removed.
+    hfc_list : list[dict[dict]]
+        The HFC list to be modified.
+
+    Returns
+    -------
+    list[dict[dict]]
+        The modified HFC list.
+
+    Raises
+    ------
+    ValueError
+        If the section is not found in the HFC list.
+    """
+    
+    list_remove = hfc_list
+
+    if not _section_exists(list_remove, section_name):
+        raise ValueError(f"Section {section_name} not found in HFC list")
+    
+    list_remove.remove({section_name: {}})
+
+    return list_remove
+
+
+# Edit a section in a hfc list
+def editSection(section_name: str, new_section_name: str, hfc_list: list[dict[dict]]):
+    """
+    Edit a section name in a HFC list.
+
+    Parameters
+    ----------
+    section_name : str
+        The name of the section to be edited.
+    new_section_name : str
+        The new name for the section.
+    hfc_list : list[dict[dict]]
+        The HFC list to be modified.
+
+    Returns
+    -------
+    list[dict[dict]]
+        The modified HFC list.
+
+    Raises
+    ------
+    ValueError
+        If the section is not found in the HFC list.
+    """
+    
+    list_edit = hfc_list
+
+    # Look for section
+    index = 0
+    if not _section_exists(list_edit, section_name):
+        raise ValueError(f"Section {section_name} not found in HFC list")
+
+    for section in hfc_list:
+        if section_name in section.keys():
+            # Edit section name
+            list_edit[index][new_section_name] = list_edit[index].pop(section_name)
+            break
+
+        index += 1
+
+    
+    return list_edit
+
+# Add a variable to a hfc list
+def addVariable(section_name: str, variable_name: str, variable_value, hfc_list: list[dict[dict]]):
+    """
+    Add a variable to a specified section in a HFC list.
+
+    Parameters
+    ----------
+    section_name : str
+        The name of the section where the variable will be added.
+    variable_name : str
+        The name of the variable to be added.
+    variable_value : any
+        The value of the variable to be added.
+    hfc_list : list[dict[dict]]
+        The HFC list to be modified.
+
+    Returns
+    -------
+    list[dict[dict]]
+        The modified HFC list.
+    """
+    
+    list_add = hfc_list
+   
+    # Look for section
+    if not _section_exists(list_add, section_name):
+        raise ValueError(f"Section {section_name} not found in HFC list")
+    
+    # Look for section index on list
+    index = 0
+    for section in list_add:
+        if section_name in section.keys():
+            # Add variable
+            list_add[index][section_name][variable_name] = variable_value
+            break
+
+        index += 1
+    
+    return list_add
+
+
+# Remove a variable from a hfc list
+def removeVariable(section_name: str, variable_name: str, hfc_list: list[dict[dict]]):
+    """
+    Remove a variable from a specified section in a HFC list.
+
+    Parameters
+    ----------
+    section_name : str
+        The name of the section where the variable will be removed.
+    variable_name : str
+        The name of the variable to be removed.
+    hfc_list : list[dict[dict]]
+        The HFC list to be modified.
+
+    Returns
+    -------
+    list[dict[dict]]
+        The modified HFC list.
+
+    Raises
+    ------
+    ValueError
+        If the section is not found in the HFC list or if the variable is not found in the section.
+    """
+    
+    list_remove = hfc_list
+
+    if not _section_exists(list_remove, section_name):
+        raise ValueError(f"Section {section_name} not found in HFC list")
+    
+    # Look for section index on list
+    index = 0
+    for section in list_remove:
+        if section_name in section.keys():
+            # Remove variable
+            if _variable_exists(list_remove, section_name, variable_name):
+                list_remove[index][section_name].pop(variable_name)
+            else:
+                raise ValueError(f"Variable {variable_name} not found in section {section_name}")
+            break
+
+        index += 1
+
+    # Look for section
+    index = 0
+
+    return list_remove
+
+
+# Rename a variable in a hfc list
+def renameVariable(section_name: str, old_variable_name: str, new_variable_name: str, hfc_list: list[dict[dict]]):
+    """
+    Rename a variable in a specified section in a HFC list.
+
+    Parameters
+    ----------
+    section_name : str
+        The name of the section where the variable will be renamed.
+    old_variable_name : str
+        The name of the variable to be renamed.
+    new_variable_name : str
+        The new name for the variable.
+    hfc_list : list[dict[dict]]
+        The HFC list to be modified.
+
+    Returns
+    -------
+    list[dict[dict]]
+        The modified HFC list.
+
+    Raises
+    ------
+    ValueError
+        If the section is not found in the HFC list or if the variable is not found in the section.
+    """
+    
+    list_rename = hfc_list
+
+    # Look for section
+    if not _section_exists(list_rename, section_name):
+        raise ValueError(f"Section {section_name} not found in HFC list")
+
+    index = 0
+    for section in hfc_list:
+        if section_name in section.keys():
+            # Rename variable in section
+            if not _variable_exists(list_rename, section_name, old_variable_name):
+                raise ValueError(f"Variable {old_variable_name} not found in section {section_name}")
+            
+            list_rename[index][section_name][new_variable_name] = list_rename[index][section_name].pop(old_variable_name)
+            break
+
+        index += 1
+
+    return list_rename
+
+
+# Edit a variable in a hfc list
+def editVariable(section_name: str, variable_name: str, new_variable_value, hfc_list: list[dict[dict]]):
+    """
+    Edit a variable's value in a specified section of a HFC list.
+
+    Parameters
+    ----------
+    section_name : str
+        The name of the section where the variable will be edited.
+    variable_name : str
+        The name of the variable to be edited.
+    new_variable_value : any
+        The new value for the variable.
+    hfc_list : list[dict[dict]]
+        The HFC list to be modified.
+
+    Returns
+    -------
+    list[dict[dict]]
+        The modified HFC list.
+
+    Raises
+    ------
+    ValueError
+        If the section is not found in the HFC list or if the variable is not found in the section.
+    """
+    list_edit = hfc_list
+
+    # Look for section
+    if not _section_exists(list_edit, section_name):
+        raise ValueError(f"Section {section_name} not found in HFC list")
+    
+    index = 0
+    for section in hfc_list:
+        if section_name in section.keys():
+            # Edit variable in section
+            if not _variable_exists(list_edit, section_name, variable_name):
+                raise ValueError(f"Variable {variable_name} not found in section {section_name}")
+
+            list_edit[index][section_name][variable_name] = new_variable_value
+            break
+
+        index += 1
+
+    return list_edit
+
+
+if __name__ == "__main__":
+    hfc_list = parseHfc("test.hfc")
+    print(addSection("Test", hfc_list))
+    print(addVariable("Test", "variable", 1, hfc_list))
+    print(editSection("Test", "Test2", hfc_list))
+    print(renameVariable("Test2", "variable", "variable2", hfc_list))
+    print(editVariable("Test2", "variable2", 2, hfc_list))
+
     try:
         import sample
     except Exception as e:
