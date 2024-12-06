@@ -287,6 +287,19 @@ def _variable_exists(hfc_list: list[dict[dict]], section_name: str, variable_nam
 
     return False
 
+
+def _clear_empty_sections(hfc_list: list[dict[dict]]):
+    for section in hfc_list:
+        if not section:
+            hfc_list.remove(section)
+        else:
+            for section_name in section.keys():
+                if section_name == "":
+                    hfc_list.remove(section)
+
+    return hfc_list
+
+
 def parseHfc(hfc_path="", hfc_text="", json_path = "", json_indent=4) -> list[dict[dict]]:
     """
     Parse a HFC text/file to a list of dictionaries.
@@ -441,6 +454,8 @@ def parseList(hfc_list: list[dict[dict]], write_path="", newline_after_section=T
     # New line after section
     if newline_after_section:
         newline = "\n"
+    
+    hfc_list = _clear_empty_sections(hfc_list)
 
     for index in hfc_list:
         # Iterate on section dict
@@ -454,13 +469,6 @@ def parseList(hfc_list: list[dict[dict]], write_path="", newline_after_section=T
                     raise e
 
                 hfc += f"{variable}{space}{langconf.VARIABLE_SEPARATOR}{space}{conv_definition}\n"
-
-
-    # Parse hfc to check validity
-    try:
-        parseHfc(hfc)
-    except Exception as e:
-        warnings.warn(f"Generated invalid .hfc string: {e}")
 
     # If write_on is not empty, write the file
     if write_path != "":
@@ -863,17 +871,18 @@ def editVariable(section_name: str, variable_name: str, new_variable_value, hfc_
     return list_edit
 
 
-if __name__ == "__main__":
-    hfc_list = parseHfc("test.hfc")
-    print(addSection("Test", hfc_list))
-    print(addVariable("Test", "variable", 1, hfc_list))
-    print(editSection("Test", "Test2", hfc_list))
-    print(renameVariable("Test2", "variable", "variable2", hfc_list))
-    print(editVariable("Test2", "variable2", 2, hfc_list))
+# Generate a ready-to-use hfc list
+def generateHFC():
+    """
+    Generate an empty HFC list.
 
-    try:
-        import sample
-    except Exception as e:
-        raise e
-    
-    sample.main()
+    Returns
+    -------
+    list[dict[dict]]
+        An empty HFC list.
+    """
+    return [{"": {}}]
+
+
+if __name__ == "__main__":
+    print("hfclib.py is not intended to be run directly")

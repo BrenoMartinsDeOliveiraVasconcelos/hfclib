@@ -275,4 +275,9 @@ Edits a variable from a defined section.
 
 Returns a json-like object.
 
+### generateHFC()
+
+Generates a ready-to-use hfc list and returns it.
+
+**Disclaimer: No args**
 
