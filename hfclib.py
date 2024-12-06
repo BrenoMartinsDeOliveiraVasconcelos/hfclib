@@ -33,7 +33,7 @@ class langconf:
 
 
 def _strip(text: str) -> str:
-    remove = ["\n", "\n\n"]
+    remove = ["\n", "\n\n", " "]
     text = text.strip()
 
     for x in remove:
@@ -512,7 +512,55 @@ def addComments(comments: list[list[int, str]], comment_char="->", input_path=""
     return hfc_str
 
 
+def getComments(hfc_path="", hfc_text="") -> list[list[int, str]]:
+    """
+    Get comments from a HFC file or string.
+
+    Parameters
+    ----------
+    hfc_path : str
+        The path to the HFC file to read from. If empty, it won't read from file.
+    hfc_text : str
+        The HFC string to read from. If empty, it won't read from file.
+
+    Returns
+    -------
+    list[list[int, str]]
+        A list of comments, where each comment is a list of two elements: the line number and the comment string.
+    """
+    comments = []
+
+    if hfc_path != "":
+        hfc_str = open(hfc_path, "r").readlines()
+        # Remove \n on each index
+        for index in range(len(hfc_str)):
+            hfc_str[index] = hfc_str[index].strip("\n")
+    elif hfc_text != "":
+        hfc_str = hfc_text.split("\n")
+    else:
+        raise ValueError("No input file or HFC string provided")
+
+    # Look for comments
+    for comment_char in langconf.COMMENT_CHARS:
+        line = 0
+        for ln in hfc_str:
+            split_ln = ln.split(comment_char)
+            split_ln[-1] = _strip(split_ln[-1])
+
+            if len(split_ln) > 1:
+                comments.append([line+1, split_ln[1]])
+            elif len(split_ln) == 1:
+                if ln.startswith(comment_char):
+                    comments.append([line+1, ln[len(comment_char):]])
+
+            line += 1
+
+    return comments
+
+
 if __name__ == "__main__":
+    print(getComments("test.hfc"))
+    
     try:
         import sample
     except Exception as e:

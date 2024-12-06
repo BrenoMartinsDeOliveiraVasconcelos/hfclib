@@ -178,3 +178,14 @@ Always returns a hfc-like string.
 
 **Disclaimer 2: You need to specify either an input_path or a hfc. Not specifing any of them will raise an error.**
 
+### getComments(hfc_path="", hfc_text="")
+
+Gets all the comments at a hfc file or string.
+
+| Arg | Optional? | Content |Type |
+| ------ | ------ | ------ | ------ |
+| hfc_path | Yes | Path of a file which the function will read | str |
+| hfc_text | Yes | hfc-valid string with comments | str |
+
+**Disclaimer: Specify one of these args, otherwise an error will be raised.**
+
