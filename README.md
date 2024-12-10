@@ -223,6 +223,16 @@ Rename a section from a hfc-valid json-like object
 
 Returns a json-like object.
 
+### getSections(hfc_list: list[dict[dict]])
+
+Get all sections in a hfc-like object
+| Arg | Optional? | Content |Type |
+| ------ | ------ | ------ | ------ |
+| hfc_list | No | hfc-valid object | list[dict[dict]] |
+
+Returns a list of sections
+
+
 ### getVariables(section_name: str, hfc_list: list[dict[dict]])
 
 Get all the variables of a specified section.
@@ -309,6 +319,29 @@ Edits a variable from a defined section.
 | hfc_list | No | hfc-valid json-like object | list[dict[dict]] |
 
 Returns a json-like object.
+
+
+### findSection(section_name: str, hfc_list: list[dict[dict]])
+
+Looks for a section with a specified name
+
+| Arg | Optional? | Content |Type |
+| ------ | ------ | ------ | ------ |
+| section_name | No | Name of the section to look for | str |
+| hfc_list | No | hfc-valid json-like object | list[dict[dict]] |
+
+Returns the section and its variables if it's found, false if don't.
+
+### findVariable(variable_name: str, hfc_list: list[dict[dict]])
+
+Looks for all variables with a specified name
+
+| Arg | Optional? | Content |Type |
+| ------ | ------ | ------ | ------ |
+| variable_name | No | Name of the variable to look for | str |
+| hfc_list | No | hfc-valid json-like object | list[dict[dict]] |
+
+Rreturns a list with all variables together with the section if it's found. Else, returns False.
 
 ### generateHFC()
 

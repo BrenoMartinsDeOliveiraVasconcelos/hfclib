@@ -687,6 +687,29 @@ def editSection(section_name: str, new_section_name: str, hfc_list: list[dict[di
     return list_edit
 
 
+# Get all sections from a hfc list
+def getSections(hfc_list: list[dict[dict]]) -> list[str]:
+    """
+    Get all sections from a HFC list.
+
+    Parameters
+    ----------
+    hfc_list : list[dict[dict]]
+        The HFC list to be modified.
+
+    Returns
+    -------
+    list[str]
+        A list of all sections in the HFC list.
+    """
+    
+    sections = []
+    for i in hfc_list:
+        sections.append(list(i.keys())[0])
+
+    return sections
+
+
 # Get all variables from a section
 def getVariables(section_name: str, hfc_list: list[dict[dict]]) -> dict:
     """
@@ -954,6 +977,59 @@ def editVariable(section_name: str, variable_name: str, new_variable_value, hfc_
         index += 1
 
     return list_edit
+
+
+# Looks for section in hfc list
+def findSection(section_name: str, hfc_list: list[dict[dict]]):
+    """
+    Look for a section in a HFC list.
+
+    Parameters
+    ----------
+    section_name : str
+        The name of the section to be found.
+    hfc_list : list[dict[dict]]
+        The HFC list to be searched.
+
+    Returns
+    -------
+    bool
+        False if is not found
+    dict
+        The section and its variables if is found
+    """
+    if not _section_exists(hfc_list, section_name):
+        return False
+
+    for i in hfc_list:
+        if section_name in i.keys():
+            return i[section_name]
+        
+
+# Find all occurrences of a variable in a hfc list
+def findVariable(variable_name: str, hfc_list: list[dict[dict]]):
+    """
+    Find all occurrences of a variable in a HFC list.
+
+    Parameters
+    ----------
+    variable_name : str
+        The name of the variable to be found.
+    hfc_list : list[dict[dict]]
+        The HFC list to be searched.
+
+    Returns
+    -------
+    list
+        A list of all occurrences of the variable in the HFC list.
+    """
+    variables = []
+    for i in hfc_list:
+        for key, value in i.items():
+            if variable_name in value.keys():
+                variables.append({f"{key}": {variable_name: value[variable_name]}})
+
+    return variables
 
 
 # Generate a ready-to-use hfc list
