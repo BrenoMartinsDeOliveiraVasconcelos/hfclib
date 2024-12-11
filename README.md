@@ -68,7 +68,7 @@ user=name = "breno"
 ```
 
 
-**Disclaimer: Special variables aren't real types in programming, so they are converted to the following types depending on the implementation.**
+**Disclaimer: Special variables aren't real types in programming, so they are converted to the following types depending on the implementation:**
 | Implementation | Type |
 | ------ | ------ |
 | Python (hfclib.py) | string|
