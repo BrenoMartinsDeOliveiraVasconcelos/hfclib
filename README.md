@@ -37,8 +37,6 @@ Variables are separated by a `=` and are dynamically typed based on its content.
 
 **Special types**
 
-They will be converted to string on Python implementation.
-
 | Type | Content | Example |
 | ------ | ------ | ------ |
 | ip_address | Any ipv4-valid value (supports ports) | `192.168.1.10:8080` or `192.168.1.10`|
