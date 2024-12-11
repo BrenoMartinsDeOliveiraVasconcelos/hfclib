@@ -43,7 +43,7 @@ They will be converted to string on Python implementation.
 | ------ | ------ | ------ |
 | ip_address | Any ipv4-valid value (supports ports) | `192.168.1.10:8080` or `192.168.1.10`|
 | ip6_address | Any ipv6-valid (supports ports) |`2001:0db8:85a3:0000:0000:8a2e:0370:7334` |
-|hexadecimal | Any hexadecimal number | `0x1A` or `1A`|
+|hexadecimal | Any hexadecimal number | `0x1A`|
 |hex_color | Any valid hex color | `#FFFFFF`|
 
 
@@ -66,6 +66,13 @@ Invalid variable:
 ```
 user=name = "breno"
 ```
+
+
+**Disclaimer: Special variables aren't real types in programming, so they are converted to the following types depending on the implementation.**
+| Implementation | Type |
+| ------ | ------ |
+| Python (hfclib.py) | string|
+
 
 ### Lists
 

@@ -34,9 +34,9 @@ class langconf:
     IP_ADDR_WPORT_REGEX = r"\b((25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)\.){3}(25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d):(\d+)\b"
     IPV6_ADDR_REGEX = r"^(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$"
     IPV6_ADDR_WPORT_REGEX = r"^(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}:\d+$"
-    HEX_VALUE_REGEX = r"\b[0-9a-fA-F]+\b"
+    HEX_VALUE_REGEX = r"\b0[xX][0-9a-fA-F]+\b"
     HEX_VALUE_REGEX_0x = r"\b0[xX][0-9a-fA-F]+\b"
-    COLOR_HEX_REGEX = r"^(#?[0-9a-fA-F]{6}|[0-9a-fA-F]{3})$"
+    COLOR_HEX_REGEX = r"^#([0-9a-fA-F]{6}|[0-9a-fA-F]{3})$"
     INVALID_NAME_REGEXES = [r"^\s*$"] # Contains regexes with invalid naming
 
 
