@@ -25,6 +25,7 @@ The name can be anything, but **cannot** be an empty value.
 
 Variables are separated by a `=` and are dynamically typed based on its content. The following list shows the types.
 
+**Primitive types**
 | Type | Content |
 | ------ | ------ |
 | string | Anything starting and ending with `"` |
@@ -33,6 +34,18 @@ Variables are separated by a `=` and are dynamically typed based on its content.
 | true_boolean | `yes`, `true`, `sim`, `verdadeiro`, `y` or `s`|
 | false_boolean | `no`, `false`, `nao`, `false` or `n`|
 | void | No content |
+
+**Special types**
+
+They will be converted to string on Python implementation.
+
+| Type | Content | Example |
+| ------ | ------ | ------ |
+| ip_address | Any ipv4-valid value (supports ports) | `192.168.1.10:8080` or `192.168.1.10`|
+| ip6_address | Any ipv6-valid (supports ports) |`2001:0db8:85a3:0000:0000:8a2e:0370:7334` |
+|hexadecimal | Any hexadecimal number | `0x1A` or `1A`|
+|hex_color | Any valid hex color | `#FFFFFF`|
+
 
 Variable naming can contain spaces, special charcters, alphanumerics, just numbers and anything but only spaces or `=`. 
 

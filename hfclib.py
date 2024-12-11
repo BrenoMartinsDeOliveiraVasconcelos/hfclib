@@ -1,6 +1,7 @@
 import re
 import warnings
 
+debug_mode = False
 
 # Known issues
 # - List inside lists raises SytaxError if nstled layers are larger than 2
@@ -13,24 +14,44 @@ class MaxDepth(Exception):
 
 
 class langconf:
-    COMMENT_CHARS = ["->", "//", "#"]
+    COMMENT_CHARS = ["->", "//"]
     SECTION_SEPARATOR = "=="
-    SECTION_REGEX = f"^{SECTION_SEPARATOR}.+{SECTION_SEPARATOR}$"
+    SECTION_REGEX = fr"^{SECTION_SEPARATOR}.+{SECTION_SEPARATOR}$"
     VARIABLE_SEPARATOR = "="
     STRING_CHAR = '"'
-    STRING_REGEX = f'^{STRING_CHAR}.+{STRING_CHAR}$'
-    INTEGER_REGEX = "^-?\d+$"
-    FLOAT_REGEX = "^\d+([.,]\d+)$"
+    STRING_REGEX = fr'^{STRING_CHAR}.+{STRING_CHAR}$'
+    INTEGER_REGEX = r"^-?\d+$"
+    FLOAT_REGEX = r"^\d+([.,]\d+)$"
     STANDARD_FLOAT_SEP = "."
     NON_STANDARD_FLOAT_SEPS = [","]
     ALL_FLOAT_SEP = [",", "."]
-    LIST_REGEXES = ["^\[.*\]$", "^\(.*\)$"]  # Match [] and ()
+    LIST_REGEXES = [r"^\[.*\]$", r"^\(.*\)$"]  # Match [] and ()
     LIST_CHARS = ["[", "]", "(", ")"]
     LIST_INDEX_SEP = ", "
     BOOLEAN_TRUE = ["yes", "true", "sim", "verdadeiro", "y", "s"]
     BOOLEAN_FALSE = ["no", "false", "nao", "falso", "n"]
-    INVALID_NAME_REGEXES = ["^\s*$"] # Contains regexes with invalid naming
+    IP_ADDR_REGEX = r"\b((25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)\.){3}(25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)\b"
+    IP_ADDR_WPORT_REGEX = r"\b((25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)\.){3}(25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d):(\d+)\b"
+    IPV6_ADDR_REGEX = r"^(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$"
+    IPV6_ADDR_WPORT_REGEX = r"^(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}:\d+$"
+    HEX_VALUE_REGEX = r"\b[0-9a-fA-F]+\b"
+    HEX_VALUE_REGEX_0x = r"\b0[xX][0-9a-fA-F]+\b"
+    COLOR_HEX_REGEX = r"^(#?[0-9a-fA-F]{6}|[0-9a-fA-F]{3})$"
+    INVALID_NAME_REGEXES = [r"^\s*$"] # Contains regexes with invalid naming
 
+
+def _debug(text: str, line: int = -1, index: int = -1):
+    if debug_mode:
+        full_text = ""
+
+        if line > -1:
+            full_text += f"[LINE {line}]"
+
+        if index > -1:
+            full_text += f" [INDEX {index}]"
+
+        full_text += f" {text}"
+        print(full_text)
 
 def _strip(text: str) -> str:
     remove = ["\n", "\n\n", " "]
@@ -72,7 +93,9 @@ def _replace(text: str, chars: list, replace_to: str, outside_only=False) -> str
 
 
 def _validate(regex: str, text: str) -> bool:
-    return re.match(regex, text)
+    result = re.fullmatch(regex, text.strip())
+
+    return result
 
 
 def _join_list_with_char(input_list: list, chars: list[str, str], list_separator: str, is_nlist=False) -> list:
@@ -170,13 +193,17 @@ def _get_converted(value: str, line_num: int):
             value_list = _join_list_with_char(input_list=value_list, chars=[langconf.STRING_CHAR, langconf.STRING_CHAR], list_separator=langconf.LIST_INDEX_SEP)
 
             # The corrected list
-            for val in value_list:            
-                converted_list.append(_get_converted(_strip(val), line_num))
+            index = 0
+            for val in value_list:
+                _debug(f"{val}", line=line_num, index=index)           
+                converted_list.append(_get_converted(_strip(val), line_num=line_num))
+                index += 1
             
             return converted_list
 
     # Only check in case of not being a list
     if not is_list:
+        _debug(f"{value}", line=line_num)
         # Checking variable type
         if _validate(langconf.STRING_REGEX, text=value): # Checking if it's string
             converted = value.replace(langconf.STRING_CHAR, "")
@@ -190,8 +217,22 @@ def _get_converted(value: str, line_num: int):
         elif value in langconf.BOOLEAN_TRUE:
             converted = True
         else:
-            raise SyntaxError(f"Invalid variable declaration at line {line_num}.")
-        
+            ip_addr_validators = [langconf.IP_ADDR_REGEX, langconf.IP_ADDR_WPORT_REGEX, langconf.IPV6_ADDR_REGEX, langconf.IPV6_ADDR_WPORT_REGEX]
+            is_special = False
+
+            hex_validators = [langconf.HEX_VALUE_REGEX, langconf.HEX_VALUE_REGEX_0x, langconf.COLOR_HEX_REGEX]
+
+            special_validators = ip_addr_validators + hex_validators
+
+            for i in special_validators:
+                if _validate(i, value):
+                    is_special = True
+            
+            if is_special:
+                converted = value
+            else:
+                raise SyntaxError(f"Invalid variable declaration at line {line_num}.")
+    _debug(f"{value} -> {converted}", line=line_num) 
     return converted
         
 
@@ -199,10 +240,30 @@ def _get_converted(value: str, line_num: int):
 def _convert_to_hfc(definition, list_char: list[str, str], bool_false: str, bool_true: str, float_separator: str):
     def_list = ""
 
+    _debug(f"Converting to hfc: {definition}")
     if type(definition) == str:
-        definition = f'{langconf.STRING_CHAR}{definition}{langconf.STRING_CHAR}'
+        _debug(f"{definition} is string.")
+        ip_addr_validators = [langconf.IP_ADDR_REGEX, langconf.IP_ADDR_WPORT_REGEX, langconf.IPV6_ADDR_REGEX, langconf.IPV6_ADDR_WPORT_REGEX]
+        is_special = False
+
+        hex_validators = [langconf.HEX_VALUE_REGEX, langconf.HEX_VALUE_REGEX_0x, langconf.COLOR_HEX_REGEX]
+
+        special_validators = ip_addr_validators + hex_validators
+
+        for i in special_validators:
+            _debug(f"Checking {i}")
+            if _validate(i, definition):
+                is_special = True
+    
+        if is_special:
+            definition = f"{definition}"
+            _debug(f"{definition} is special string.")
+        else:
+            definition = f'{langconf.STRING_CHAR}{definition}{langconf.STRING_CHAR}'
+            _debug(f"{definition} is a normal string.")
 
     if type(definition) == list:
+        _debug(f"{definition} is a list.")
         # Valid hfc list converting
         start_list = ""
         end_list = ""
@@ -220,6 +281,7 @@ def _convert_to_hfc(definition, list_char: list[str, str], bool_false: str, bool
         def_list += start_list
         def_index = 0
         for i in definition:
+            _debug(f"{i}", index=def_index)
             string = langconf.LIST_INDEX_SEP if def_index > 0 else "" # Separator string
             try:
                 def_list += f"{string}{_convert_to_hfc(i, list_char, bool_false, bool_true, float_separator)}"
@@ -232,17 +294,22 @@ def _convert_to_hfc(definition, list_char: list[str, str], bool_false: str, bool
 
         # If the outcome is a valid list
         valid = False
+        _debug("Checking validity of generated list.")
         for regex in langconf.LIST_REGEXES:
+            _debug(f"Checking {regex}")
             if _validate(regex, def_list):
                 valid = True
 
         if not valid:
             raise TypeError("list_char values are not valid, so it didn't generate a valid HFC file.")
+        else:
+            _debug(f"Generated a valid list.")
 
         definition = def_list
 
     # In case it's bool
     if type(definition) == bool:
+        _debug(f"{definition} is boolean.")
         if definition:
             if bool_true in langconf.BOOLEAN_TRUE:
                 definition = bool_true
@@ -256,6 +323,7 @@ def _convert_to_hfc(definition, list_char: list[str, str], bool_false: str, bool
     
     # In case it's a floa
     if type(definition) == float:
+        _debug(f"{definition} is a float.")
         # Replace for the defined separator
         if float_separator in langconf.ALL_FLOAT_SEP and float_separator != langconf.STANDARD_FLOAT_SEP: # Like if the standard float sep will ever change lol
             definition = str(definition).replace(".", float_separator)
@@ -263,7 +331,8 @@ def _convert_to_hfc(definition, list_char: list[str, str], bool_false: str, bool
             pass
         else:
             raise NotHFC("Invalid float_separator caused a invalid HFC text.")
-        
+    
+    _debug(f"Final output: {definition}")
     return definition
 
 
@@ -340,6 +409,8 @@ def parseHfc(hfc_path="", hfc_text="", json_path = "", json_indent=4) -> list[di
     if hfc == "":
         raise NotHFC("Nothing to do.")
     
+    _debug(f"Parsing hfc...")
+    
     # Iterate over it
     sections = 0
     list_index = -1
@@ -351,14 +422,16 @@ def parseHfc(hfc_path="", hfc_text="", json_path = "", json_indent=4) -> list[di
 
         # Ignore any line starting with a comment
         for commentchar in langconf.COMMENT_CHARS:
-                
             if line.startswith(commentchar):
+                _debug(f"Ignoring comment", line=line_num)
                 continue
 
         # Section
         if _validate(regex=langconf.SECTION_REGEX, text=line):
             sections += 1
             list_index += 1
+
+            _debug(f"{line} is a section.", line=line_num)
 
             # Separated section name
             section_name = _strip(_replace(line, chars=[langconf.SECTION_SEPARATOR], replace_to=""))
@@ -373,6 +446,7 @@ def parseHfc(hfc_path="", hfc_text="", json_path = "", json_indent=4) -> list[di
         # Variable
         variable_raw = line.split(langconf.VARIABLE_SEPARATOR)
         variable = []
+
         
         # Let's remove comments from variable declarations
         for declaration in variable_raw:
@@ -384,6 +458,7 @@ def parseHfc(hfc_path="", hfc_text="", json_path = "", json_indent=4) -> list[di
             
             variable.append(_strip(dec_correct)) # Append to the variable list
 
+        _debug(f"{variable_raw} -> {variable}", line=line_num)
         if len(variable) >= 1:
             if variable[0] != "":
                 for regex in langconf.INVALID_NAME_REGEXES:
@@ -402,6 +477,8 @@ def parseHfc(hfc_path="", hfc_text="", json_path = "", json_indent=4) -> list[di
                     else:
                         value = _get_converted(value=variable[1], line_num=line_num)
                         parsed[list_index][section_name][variable[0]] = value
+
+        _debug(f"Sections: {sections}, List index: {list_index}, Section name: {section_name}")
 
 
     if json_path != "":
@@ -442,7 +519,8 @@ def parseList(hfc_list: list[dict[dict]], write_path="", newline_after_section=T
         The HFC string.
     """
     
-    
+    _debug(f"Parsing hfc list...")
+
     hfc = ""
     space = ""
     newline = ""
@@ -458,11 +536,13 @@ def parseList(hfc_list: list[dict[dict]], write_path="", newline_after_section=T
     hfc_list = _clear_empty_sections(hfc_list)
 
     for index in hfc_list:
+        _debug(f"Section: {index}")
         # Iterate on section dict
         for key, value in index.items():
             hfc += f"{newline}{langconf.SECTION_SEPARATOR}{space}{key}{space}{langconf.SECTION_SEPARATOR}\n{newline}"
-            
+
             for variable, definition in value.items():
+                _debug(f"Variable: {variable} = {definition}")
                 try:
                     conv_definition = _convert_to_hfc(definition, list_char, bool_false, bool_true, float_separator)
                 except Exception as e:
@@ -1043,11 +1123,3 @@ def generateHFC():
         An empty HFC list.
     """
     return [{"": {}}]
-
-
-if __name__ == "__main__":
-    hfc_list = parseHfc(hfc_path="speed.hfc")
-    print(getVariables("Section 1", hfc_list))
-    print(getVariableValue("Section 1", "Variable_1", hfc_list))
-    
-    print("hfclib.py is not intended to be run directly")
