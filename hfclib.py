@@ -38,6 +38,7 @@ class langconf:
     HEX_VALUE_REGEX_0x = r"\b0[xX][0-9a-fA-F]+\b"
     COLOR_HEX_REGEX = r"^#([0-9a-fA-F]{6}|[0-9a-fA-F]{3})$"
     INVALID_NAME_REGEXES = [r"^\s*$"] # Contains regexes with invalid naming
+    URL_REGEX = r"^https?:\/\/(?:www\.)?([-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b)*(\/[\/\d\w\.-]*)*(?:[\?])*(.+)*$"
 
 
 def _debug(text: str, line: int = -1, index: int = -1):
@@ -221,8 +222,9 @@ def _get_converted(value: str, line_num: int):
             is_special = False
 
             hex_validators = [langconf.HEX_VALUE_REGEX, langconf.HEX_VALUE_REGEX_0x, langconf.COLOR_HEX_REGEX]
+            url_validators = [langconf.URL_REGEX]
 
-            special_validators = ip_addr_validators + hex_validators
+            special_validators = ip_addr_validators + hex_validators + url_validators
 
             for i in special_validators:
                 if _validate(i, value):
@@ -247,8 +249,9 @@ def _convert_to_hfc(definition, list_char: list[str, str], bool_false: str, bool
         is_special = False
 
         hex_validators = [langconf.HEX_VALUE_REGEX, langconf.HEX_VALUE_REGEX_0x, langconf.COLOR_HEX_REGEX]
+        url_validators = [langconf.URL_REGEX]
 
-        special_validators = ip_addr_validators + hex_validators
+        special_validators = ip_addr_validators + hex_validators + url_validators
 
         for i in special_validators:
             _debug(f"Checking {i}")
@@ -453,8 +456,20 @@ def parseHfc(hfc_path="", hfc_text="", json_path = "", json_indent=4) -> list[di
             dec_correct = [declaration]
             for commentchar in langconf.COMMENT_CHARS:
                 dec_correct = dec_correct[0].split(commentchar)
+                copy_dec_correct = dec_correct.copy()
+                
+                index = 0
+                for part in dec_correct:
+                    # Looks for non-string comments:
+                    if not part.endswith(langconf.STRING_CHAR) and index > 0:
+                        copy_dec_correct[index] = ""
+                    else:
+                        if index > 0:
+                            copy_dec_correct[index] = commentchar+part
+                    
+                    index += 1
 
-            dec_correct = dec_correct[0] # The final declaration without comments
+            dec_correct = "".join(copy_dec_correct.copy()) # The final declaration without comments
             
             variable.append(_strip(dec_correct)) # Append to the variable list
 
