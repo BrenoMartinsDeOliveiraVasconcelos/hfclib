@@ -460,13 +460,14 @@ def parseHfc(hfc_path="", hfc_text="", json_path = "", json_indent=4) -> list[di
                 
                 index = 0
                 for part in dec_correct:
-                    # Looks for non-string comments:
-                    if not part.endswith(langconf.STRING_CHAR) and index > 0:
-                        copy_dec_correct[index] = ""
-                    else:
-                        if index > 0:
+                    # Looks for non-string comments
+                    print(part)
+                    if index > 0:
+                        if not part.endswith(langconf.STRING_CHAR):
+                            copy_dec_correct[index] = ""
+                        else:
                             copy_dec_correct[index] = commentchar+part
-                    
+
                     index += 1
 
             dec_correct = "".join(copy_dec_correct.copy()) # The final declaration without comments
