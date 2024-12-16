@@ -38,7 +38,7 @@ class langconf:
     HEX_VALUE_REGEX_0x = r"\b0[xX][0-9a-fA-F]+\b"
     COLOR_HEX_REGEX = r"^#([0-9a-fA-F]{6}|[0-9a-fA-F]{3})$"
     INVALID_NAME_REGEXES = [r"^\s*$"] # Contains regexes with invalid naming
-    URL_REGEX = r"^https?:\/\/(?:www\.)?([-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b)*(\/[\/\d\w\.-]*)*(?:[\?])*(.+)*$"
+    #URL_REGEX = r"^https?:\/\/(?:www\.)?([-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b)*(\/[\/\d\w\.-]*)*(?:[\?])*(.+)*$"
 
 
 def _debug(text: str, line: int = -1, index: int = -1):
@@ -222,9 +222,9 @@ def _get_converted(value: str, line_num: int):
             is_special = False
 
             hex_validators = [langconf.HEX_VALUE_REGEX, langconf.HEX_VALUE_REGEX_0x, langconf.COLOR_HEX_REGEX]
-            url_validators = [langconf.URL_REGEX]
+            #url_validators = [langconf.URL_REGEX]
 
-            special_validators = ip_addr_validators + hex_validators + url_validators
+            special_validators = ip_addr_validators + hex_validators #+ url_validators
 
             for i in special_validators:
                 if _validate(i, value):
@@ -249,9 +249,9 @@ def _convert_to_hfc(definition, list_char: list[str, str], bool_false: str, bool
         is_special = False
 
         hex_validators = [langconf.HEX_VALUE_REGEX, langconf.HEX_VALUE_REGEX_0x, langconf.COLOR_HEX_REGEX]
-        url_validators = [langconf.URL_REGEX]
+        #url_validators = [langconf.URL_REGEX]
 
-        special_validators = ip_addr_validators + hex_validators + url_validators
+        special_validators = ip_addr_validators + hex_validators #+ url_validators
 
         for i in special_validators:
             _debug(f"Checking {i}")

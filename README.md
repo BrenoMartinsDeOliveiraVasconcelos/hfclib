@@ -101,8 +101,9 @@ This configuration file standard supports one-line comments, which will be ignor
 ```
 -> Comment
 // Coment 2
-# Comment 3
 ```
+
+**Disclaimer: If you want to put one of those characters into a string, don't comment it after the declaration. It's a known issue that will be fixed later.**
 
 ## Example
 
@@ -111,9 +112,9 @@ Here's an example of a valid hfc file.
 ```
 == Server ==
 
-ip = "192.168.1.10" -> Server ip
+ip = 192.168.1.10 -> Server ip
 port = 8080 // Server port
-uri_list = ["home", "panel", "userProfile", "settings"] # List of uris
+uri_list = ["home", "panel", "userProfile", "settings"] -> List of uris
 mode = 1 # 0 is production, 1 is development
 
 == User Management ==
@@ -122,7 +123,7 @@ admins = ["root", "robert", "john", "jacob", "victoria"]
 
 == Database ==
 
-db_server = "192.168.1.11" // IP of database server
+db_server = 192.168.1.11 // IP of database server
 port = 1433
 login = "root"
 password = "root"
