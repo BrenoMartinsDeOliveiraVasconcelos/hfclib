@@ -4,6 +4,17 @@ Personal project trying to make a more human readable and writable configuration
 
 Made in Python, but wanting to make a library for other languages too. Feel free to make a version for your favorite language.
 
+# Comparision with other configuration/data storing file types
+| - | Identation | Commenting | Nestling | Radability |
+| ------ | ------ | ------ | ------ | ------ |
+| HFC | No | Yes | Limited (Lists, up to 2 levels) | Yes |
+| Json | Yes | No | Yes | Yes |
+| XML | Yes | Partial (Comments are read) | Yes | No |
+| Ini | No | No | No | Yes |
+| YAML | Yes | Yes | Yes | Yes
+
+
+
 # How to write a valid HFC file
 ## The basics
 
